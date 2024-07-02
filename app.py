@@ -54,29 +54,36 @@ class OzonAPI:
         response = requests.post(url, headers=headers, json=payload)
         return response.json()
 
-ozon_api = OzonAPI('XXX', 'XXX')
-
 @app.route('/get_actions', methods=['GET'])
 def get_actions():
+    ozon_api = OzonAPI('XXX', 'XXX')
     actions = ozon_api.get_actions()
     return jsonify(actions)
 
+
 @app.route('/get_action_candidates', methods=['GET'])
 def get_action_candidates():
-    action_candidates = ozon_api.get_action_candidates(1139903,10,0)
+    ozon_api = OzonAPI('XXX', 'XXX')
+    action_id = 1139903
+    action_candidates = ozon_api.get_action_candidates(action_id, 10, 0)
     return jsonify(action_candidates)
+
 
 @app.route('/add_products_to_action', methods=['GET'])
 def add_products_to_action():
+    ozon_api = OzonAPI('XXX', 'XXX')
     action_id = 1139903
-    data = ozon_api.get_action_candidates(action_id,10,0)
-    filtered_products = [product for product in data['result']['products'] if ((product['price'] - product['max_action_price']) / product['price']) < 0.1]
+    data = ozon_api.get_action_candidates(action_id, 10, 0)
+    filtered_products = [product for product in data['result']['products'] if
+                         ((product['price'] - product['max_action_price']) / product['price']) < 0.1]
     if filtered_products:
         for product in filtered_products:
-            result = ozon_api.add_products_to_action(action_id,product['max_action_price'], product['id'], product['stock'])
+            result = ozon_api.add_products_to_action(action_id, product['max_action_price'], product['id'],
+                                                     product['stock'])
             return jsonify(result)
     else:
         return jsonify({'message': 'No products found'})
 
+
 if __name__ == '__main__':
-    threading.Thread(target=app.run, kwargs={'host': '127.0.0.1','port':5000}).start()
+    threading.Thread(target=app.run, kwargs={'host': '127.0.0.1', 'port': 5000}).start()
